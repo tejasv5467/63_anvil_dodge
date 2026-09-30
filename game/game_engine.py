@@ -3,6 +3,11 @@ from game.player import Player
 from game.anvil import Anvil
 
 
+BASE_SPAWN_DELAY = 700   # ms between anvils at the start of a run
+MIN_SPAWN_DELAY = 200    # ms floor so the game never becomes impossible
+DELAY_DROP_PER_SEC = 12  # ms shaved off the delay for every second survived
+
+
 class GameEngine:
     def __init__(self, width, height):
         self.width = width
@@ -10,7 +15,7 @@ class GameEngine:
         self.player = Player(width, height)
         self.anvils = []
 
-        self.spawn_delay = 700
+        self.spawn_delay = BASE_SPAWN_DELAY
         self.last_spawn_time = pygame.time.get_ticks()
 
         self.start_ticks = pygame.time.get_ticks()
@@ -40,6 +45,12 @@ class GameEngine:
 
         self.survival_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
 
+        # Dynamic difficulty: spawn faster the longer the player survives
+        self.spawn_delay = max(
+            MIN_SPAWN_DELAY,
+            BASE_SPAWN_DELAY - self.survival_time * DELAY_DROP_PER_SEC,
+        )
+
         now = pygame.time.get_ticks()
         if now - self.last_spawn_time >= self.spawn_delay:
             self.anvils.append(Anvil(self.width))
@@ -58,6 +69,7 @@ class GameEngine:
     def reset(self):
         self.player = Player(self.width, self.height)
         self.anvils.clear()
+        self.spawn_delay = BASE_SPAWN_DELAY
         self.start_ticks = pygame.time.get_ticks()
         self.last_spawn_time = pygame.time.get_ticks()
         self.survival_time = 0
