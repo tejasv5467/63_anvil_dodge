@@ -18,10 +18,9 @@ class Player:
     def move_right(self):
         self.x += self.speed
 
-    def update(self):
-        #BUG SYMPTOM: 
-        #Player can move completely off-screen
-        pass
+           def update(self):
+           # Keep the player fully inside the visible screen
+           self.x = max(0, min(self.x, self.screen_width - self.width))
 
     @property
     def rect(self):
