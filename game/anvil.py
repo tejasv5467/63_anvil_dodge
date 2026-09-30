@@ -21,6 +21,9 @@ class Anvil:
     def is_off_screen(self, screen_height):
         return self.y > screen_height + 10
 
+    def hits_ground(self, ground_y):
+        return self.y + self.height >= ground_y
+
     @property
     def rect(self):
         return pygame.Rect(int(self.x), int(self.y), self.width, self.height)
